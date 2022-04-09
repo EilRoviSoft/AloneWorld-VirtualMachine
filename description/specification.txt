@@ -1,0 +1,46 @@
+Instructions set
+	SYSTEM //system commands [0x0 - 0xFF]
+		halt 		0x0
+		
+		ncall		0x01 	call native function
+		call		0x02 	write adress to heap of stack, move bp, jump to this adress
+		ret 		0x03 	exit from last function, clean stack to bp, jump to adress at bp
+
+		malloc		0x10	allocate memory block and stores adress to compute register
+		realloc		0x11	reallocate memory block and stores actual adress to compute register
+		free		0x12	free memory block
+
+		jmp			0x20 	jump to adress
+		goto		0x21 	jump to adress with saving previous adress
+		jif_g		0x22	0x23 	jump to adress if Positive
+		jif_goq		0x24	0x25 	jump to adress if Positive or Zero
+		jif_l		0x26	0x27 	jump to adress if Negative
+		jif_loq		0x28	0x29 	jump to adress if Negative or Zero
+		jif_eq		0x2A	0x2B 	[if equal ip = 1_adress, if equal ip = 1_adress the ip 1_adress] jump to adress if Zero
+		jif_neq		0x2C	0x2D 	jump to adress if NotZero
+
+	INTEGER [0x0 + Shift - 0x7F + Shift]
+		mov 				0x00	0x01	[1_var = 2_const, 1_var = 2_var]
+		push	 			0x02	0x03	[1_const, 1_var]
+		pop					0x04	0x05	[reg = heap, 1_var = heap]
+		get					0x06	0x07	[reg = 1_adress, 1_adress = 2_global]
+		set					0x08	0x09	[1_global = 2_const, 1_global = 2_var]
+
+		add					0x10	0x13	[1_var += 2_const, 1_var += 2_var, 1_var = 2_var + 3_const, 1_var = 2_var + 3_var]
+		sub					0x14	0x17	[1_var -= 2_const, 1_var -= 2_var, 1_var = 2_var - 3_const, 1_var = 2_var - 3_var]
+		mul					0x18	0x1B	[1_var *= 2_const, 1_var *= 2_var, 1_var = 2_var * 3_const, 1_var = 2_var * 3_var]
+		div					0x1C	0x1F	[1_var /= 2_const, 1_var /= 2_var, 1_var = 2_var / 3_const, 1_var = 2_var / 3_var]
+
+		mod					0x20	0x23	[1_var %= 2_const, 1_var %= 2_var, 1_var = 2_var % 3_const, 1_var = 2_var % 3_var]
+		and					0x24	0x27	[1_var &= 2_const, 1_var &= 2_var, 1_var = 2_var & 3_const, 1_var = 2_var & 3_var]
+		or					0x28	0x2B	[1_var |= 2_const, 1_var |= 2_var, 1_var = 2_var | 3_const, 1_var = 2_var | 3_var]
+		xor					0x2C	0x2F	[1_var ^= 2_const, 1_var ^= 2_var, 1_var = 2_var ^ 3_const, 1_var = 2_var ^ 3_var]
+
+		shl					0x30	0x33	[1_var <<= 2_const, 1_var <<= 2_var, 1_var = 2_var << 3_const, 1_var = 2_var << 3_var]
+		shr					0x34	0x37	[1_var >>= 2_const, 1_var >>= 2_var, 1_var = 2_var >> 3_const, 1_var = 2_var >> 3_var]
+		neg					0x38	0x39	[1_var = -1_var, 1_var = -2_var]
+		not					0x3A	0x3B	[1_var = ~1_var, 1_var = ~2_var]
+		cmp					0x3C	0x3D	[1_var <=> 2_const, 1_var <=> 2_var]
+
+Registers set:
+	
