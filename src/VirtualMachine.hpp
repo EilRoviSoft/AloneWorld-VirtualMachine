@@ -11,27 +11,29 @@
 #include "Info.hpp"
 
 namespace alone {
-	using Task = std::function <void(struct Context&)>;
+	using Task = std::function <void(class VirtualMachine&)>;
 
 	struct Context {
 		info::Flags* flags;
 		size_t* ip = nullptr, * bp = nullptr, * sp = nullptr;
-		std::byte* mem = nullptr, * regmem = nullptr, * locmem = nullptr;
+		size_t* offset, * length;
+		std::byte* mem = nullptr, * regmem = nullptr, * localmem = nullptr;
 
 		Context(class VirtualMachine& vm);
 
 		template <class _T>
-		_T& atReg(info::Register reg) {
+		_T& getRegister(info::Register reg) {
 			return regmem[reg];
 		}
 		template <class _T>
-		_T& atLoc(size_t adress) {
-			return locmem[adress];
+		_T& getLocal(size_t adress) {
+			return localmem[adress];
 		}
 	};
 
 	class VirtualMachine {
 		friend struct Context;
+		friend class Settings;
 	public:
 		std::shared_ptr <Context> ctx = nullptr;
 
@@ -68,7 +70,17 @@ namespace alone {
 			return reinterpret_cast <_T*>(&this->_memory[adress]);
 		}
 
+		void observe(size_t ptr) {
+			this->_global.emplace(ptr);
+		}
+		void forget(size_t adress, bool isFree) {
+			if (isFree)
+				std::free((void*)adress);
+			this->_global.erase(adress);
+		}
+
 		//instructions and functions
+
 		void setInstruction(uint16_t id, Task instruction) {
 			this->_instructions.emplace(id, instruction);
 		}

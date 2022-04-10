@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Instruction.cpp" />
+    <ClCompile Include="src\Util.cpp" />
     <ClCompile Include="src\VirtualMachine.cpp" />
   </ItemGroup>
   <ItemGroup>

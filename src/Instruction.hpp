@@ -9,6 +9,9 @@ namespace alone::inst {
 		Settings(VirtualMachine& vm) : m_vm(vm) {}
 
 		void initSystemSet();
+		void initOsSet();
+		template <class _T>
+		void initTypeSet();
 
 	protected:
 		VirtualMachine& m_vm;
