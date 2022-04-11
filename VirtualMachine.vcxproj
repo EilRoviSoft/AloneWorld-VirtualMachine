@@ -146,6 +146,7 @@
     <ClCompile Include="src\VirtualMachine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Console.hpp" />
     <ClInclude Include="src\Info.hpp" />
     <ClInclude Include="src\Instruction.hpp" />
     <ClInclude Include="src\Util.hpp" />

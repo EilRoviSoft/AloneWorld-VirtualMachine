@@ -23,11 +23,11 @@ namespace alone {
 
 		template <class _T>
 		_T& getRegister(info::Register reg) {
-			return regmem[reg];
+			return *reinterpret_cast <_T*>(&regmem[reg]);
 		}
 		template <class _T>
 		_T& getLocal(size_t adress) {
-			return localmem[adress];
+			return *reinterpret_cast <_T*>(&localmem[adress]);
 		}
 	};
 
@@ -38,7 +38,7 @@ namespace alone {
 		std::shared_ptr <Context> ctx = nullptr;
 
 		VirtualMachine() {
-			this->_Resize(info::LocMemSize);
+			this->_memory.resize(info::LocMemSize);
 			this->ctx.reset(new Context(*this));
 		}
 
@@ -79,6 +79,12 @@ namespace alone {
 			this->_global.erase(adress);
 		}
 
+		void freeGlobals() {
+			for (auto it : this->_global)
+				std::free((void*)it);
+			this->_global.clear();
+		}
+
 		//instructions and functions
 
 		void setInstruction(uint16_t id, Task instruction) {
@@ -97,12 +103,5 @@ namespace alone {
 		std::set <size_t> _global;
 		std::unordered_map <size_t, Task> _functions;
 		std::unordered_map <uint16_t, Task> _instructions;
-
-		void _Resize(size_t size) {
-			this->_memory.resize(size);
-		}
-		void _Free() {
-
-		}
 	};
 }

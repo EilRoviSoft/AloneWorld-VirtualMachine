@@ -20,27 +20,27 @@ Instructions set
 		jif_neq		0x2C	0x2D 	jump to adress if NotZero
 
 	INTEGER [0x0 + Shift - 0x7F + Shift]
-		mov 				0x00	0x01	[1_var = 2_const, 1_var = 2_var]
-		push	 			0x02	0x03	[1_const, 1_var]
-		pop					0x04	0x05	[reg = heap, 1_var = heap]
-		get					0x06	0x07	[reg = 1_adress, 1_adress = 2_global]
-		set					0x08	0x09	[1_global = 2_const, 1_global = 2_var]
+		mov 				0x00	0x01	[var = const, lhs = rhs]
+		push	 			0x02	0x03	[const, var]
+		pop					0x04	0x05	[reg = heap, var = heap]
+		get					0x06			[local = global]
+		set					0x07			[global = local]
+		cmp					0x08	0x09	[var <=> const, lhs <=> rhs]
 
-		add					0x10	0x13	[1_var += 2_const, 1_var += 2_var, 1_var = 2_var + 3_const, 1_var = 2_var + 3_var]
-		sub					0x14	0x17	[1_var -= 2_const, 1_var -= 2_var, 1_var = 2_var - 3_const, 1_var = 2_var - 3_var]
-		mul					0x18	0x1B	[1_var *= 2_const, 1_var *= 2_var, 1_var = 2_var * 3_const, 1_var = 2_var * 3_var]
-		div					0x1C	0x1F	[1_var /= 2_const, 1_var /= 2_var, 1_var = 2_var / 3_const, 1_var = 2_var / 3_var]
+		add					0x0A	0x0F	[var imm const, var imm var, var mov lhs and const, var mov lhs and rhs, stack, reg]
+		sub					0x10	0x15
+		mul					0x16	0x1B
+		div					0x1C	0x21
 
-		mod					0x20	0x23	[1_var %= 2_const, 1_var %= 2_var, 1_var = 2_var % 3_const, 1_var = 2_var % 3_var]
-		and					0x24	0x27	[1_var &= 2_const, 1_var &= 2_var, 1_var = 2_var & 3_const, 1_var = 2_var & 3_var]
-		or					0x28	0x2B	[1_var |= 2_const, 1_var |= 2_var, 1_var = 2_var | 3_const, 1_var = 2_var | 3_var]
-		xor					0x2C	0x2F	[1_var ^= 2_const, 1_var ^= 2_var, 1_var = 2_var ^ 3_const, 1_var = 2_var ^ 3_var]
+		mod					0x22	0x27
+		and					0x28	0x2D
+		or					0x2E	0x33
+		xor					0x34	0x39
 
-		shl					0x30	0x33	[1_var <<= 2_const, 1_var <<= 2_var, 1_var = 2_var << 3_const, 1_var = 2_var << 3_var]
-		shr					0x34	0x37	[1_var >>= 2_const, 1_var >>= 2_var, 1_var = 2_var >> 3_const, 1_var = 2_var >> 3_var]
-		neg					0x38	0x39	[1_var = -1_var, 1_var = -2_var]
-		not					0x3A	0x3B	[1_var = ~1_var, 1_var = ~2_var]
-		cmp					0x3C	0x3D	[1_var <=> 2_const, 1_var <=> 2_var]
+		shl					0x3A	0x3F
+		shr					0x40	0x45
+		neg					0x46	0x47	[var = -var, lhs = -rhs]
+		not					0x48	0x49	[var = ~var, lhs = ~rhs]
 
 Registers set:
 	

@@ -48,8 +48,8 @@ namespace alone {
 
 			return result;
 		}
-		std::vector<uint8_t> string2vector(const std::string& src) {
-			return std::vector <uint8_t>(src.begin(), src.end());
+		std::vector<char> string2vector(const std::string& src) {
+			return std::vector <char>(src.begin(), src.end());
 		}
 	}
 	namespace op {

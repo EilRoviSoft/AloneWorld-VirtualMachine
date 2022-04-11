@@ -10,8 +10,10 @@ namespace alone::inst {
 
 		void initSystemSet();
 		void initOsSet();
-		template <class _T>
-		void initTypeSet();
+		
+		template <class _T, size_t StartId>
+		void initIntTypeSet();
+		void initIntegerSets();
 
 	protected:
 		VirtualMachine& m_vm;

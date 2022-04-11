@@ -144,7 +144,7 @@ namespace alone::inst {
 			*ctx->ip += 0x12;
 		}
 		template <class _T>
-		void _mov_const(VirtualMachine& vm) {
+		void _mov_var(VirtualMachine& vm) {
 			auto& ctx = vm.ctx;
 			_T& lhs = ctx->getLocal <_T>(*ctx->ip + 0x02);
 			_T& rhs = ctx->getLocal <_T>(*ctx->ip + 0x0A);
@@ -195,7 +195,7 @@ namespace alone::inst {
 		void _pop_to_var(VirtualMachine& vm) {
 			auto& ctx = vm.ctx;
 			_T& heap = ctx->getLocal <_T>(*ctx->sp);
-			_T& var = ctx->getRegister <_T>(*ctx->ip + 0x02);
+			_T& var = ctx->getLocal <_T>(*ctx->ip + 0x02);
 
 			var = heap;
 			heap = 0;
@@ -226,9 +226,149 @@ namespace alone::inst {
 
 			*ctx->ip += 0x12;
 		}
-	}
-	template <class _T>
-	void Settings::initTypeSet() {
 
+		//compare
+
+		template <class _T>
+		void _cmp_const(VirtualMachine& vm) {
+			auto& ctx = vm.ctx;
+			_T& var = ctx->getLocal <_T>(*ctx->ip + 0x02);
+			_T val = ctx->getLocal <_T>(*ctx->ip + 0x0A);
+
+			auto& flags = ctx->flags;
+			auto compared = var - val;
+
+			flags->SF = compared >> (sizeof(_T) * 8 - 1);
+			flags->ZF = compared;
+
+			*ctx->ip += 0x0A + sizeof(_T);
+		}
+		template <class _T>
+		void _cmp_var(VirtualMachine& vm) {
+			auto& ctx = vm.ctx;
+			_T& lhs = ctx->getLocal <_T>(*ctx->ip + 0x02);
+			_T& rhs = ctx->getLocal <_T>(*ctx->ip + 0x0A);
+
+			auto& flags = ctx->flags;
+			auto compared = lhs - rhs;
+
+			flags->SF = compared >> (sizeof(_T) * 8 - 1);
+			flags->ZF = compared;
+
+			*ctx->ip += 0x12;
+		}
+
+		//binary operations
+
+		template <class _T>
+		void _binary_imm_const(VirtualMachine& vm, std::function <_T(const _T&, const _T&)> func) {
+			auto& ctx = vm.ctx;
+			_T& var = ctx->getLocal <_T>(*ctx->ip + 0x02);
+			_T val = ctx->getLocal <_T>(*ctx->ip + 0x0A);
+
+			var = func(var, val);
+
+			*ctx->ip += 0x0A + sizeof(_T);
+		}
+		template <class _T>
+		void _binary_imm_var(VirtualMachine& vm, std::function <_T(const _T&, const _T&)> func) {
+			auto& ctx = vm.ctx;
+			_T& lhs = ctx->getLocal <_T>(*ctx->ip + 0x02);
+			_T& rhs = ctx->getLocal <_T>(*ctx->ip + 0x0A);
+
+			lhs = func(lhs, rhs);
+
+			*ctx->ip += 0x12;
+		}
+		template <class _T>
+		void _binary_mov_const(VirtualMachine& vm, std::function <_T(const _T&, const _T&)> func) {
+			auto& ctx = vm.ctx;
+			_T& dest = ctx->getLocal <_T>(*ctx->ip + 0x02);
+			_T& lhs = ctx->getLocal <_T>(*ctx->ip + 0x0A);
+			_T rhs = ctx->getLocal <_T>(*ctx->ip + 0x12);
+
+			dest = func(lhs, rhs);
+
+			*ctx->ip += 0x12 + sizeof(_T);
+		}
+		template <class _T>
+		void _binary_mov_var(VirtualMachine& vm, std::function <_T(const _T&, const _T&)> func) {
+			auto& ctx = vm.ctx;
+			_T& dest = ctx->getLocal <_T>(*ctx->ip + 0x02);
+			_T& lhs = ctx->getLocal <_T>(*ctx->ip + 0x0A);
+			_T& rhs = ctx->getLocal <_T>(*ctx->ip + 0x12);
+
+			dest = func(lhs, rhs);
+
+			*ctx->ip += 0x1A;
+		}
+		template <class _T>
+		void _binary_stack(VirtualMachine& vm, std::function <_T(const _T&, const _T&)> func) {
+			auto& ctx = vm.ctx;
+			_T& lhs = ctx->getLocal <_T>(*ctx->sp - sizeof(_T));
+			_T& rhs = ctx->getLocal <_T>(*ctx->sp);
+
+			lhs = func(lhs, rhs);
+
+			*ctx->sp -= sizeof(_T);
+			ctx->ip += 0x02;
+		}
+		template <class _T>
+		void _binary_reg(VirtualMachine& vm, std::function <_T(const _T&, const _T&)> func) {
+			auto& ctx = vm.ctx;
+			_T& res = ctx->getRegister <_T>(info::RX);
+			_T& lhs = ctx->getRegister <_T>(info::LCX);
+			_T& rhs = ctx->getRegister <_T>(info::RCX);
+
+			res = func(lhs, rhs);
+
+			*ctx->ip += 0x02;
+		}
+	}
+	template <class _T, size_t StartId>
+	void Settings::initIntTypeSet() {
+		namespace ph = std::placeholders;
+		static const std::vector <std::function <_T(const _T&, const _T&)>> binary_funcs = {
+			op::_add <_T>, op::_sub <_T>, op::_mul <_T>, op::_div <_T>,
+			op::_mod <_T>, op::_and <_T>, op::_or <_T>, op::_xor <_T>,
+			op::_shl <_T>, op::_shr <_T>
+		};
+
+		this->m_vm.setInstruction(StartId + 0x00, mem::_mov_const <_T>);
+		this->m_vm.setInstruction(StartId + 0x01, mem::_mov_var <_T>);
+
+		this->m_vm.setInstruction(StartId + 0x02, mem::_push_const <_T>);
+		this->m_vm.setInstruction(StartId + 0x03, mem::_push_var <_T>);
+
+		this->m_vm.setInstruction(StartId + 0x04, mem::_pop_to_reg <_T>);
+		this->m_vm.setInstruction(StartId + 0x05, mem::_pop_to_var <_T>);
+
+		this->m_vm.setInstruction(StartId + 0x06, mem::_get <_T>);
+		this->m_vm.setInstruction(StartId + 0x07, mem::_set <_T>);
+
+		this->m_vm.setInstruction(StartId + 0x08, mem::_cmp_const <_T>);
+		this->m_vm.setInstruction(StartId + 0x09, mem::_cmp_var <_T>);
+
+		for (size_t i = 0; i != binary_funcs.size(); i++) {
+			this->m_vm.setInstruction(StartId + i * 0x06 + 0x0A, std::bind(mem::_binary_imm_const <_T>, ph::_1, binary_funcs.at(i)));
+			this->m_vm.setInstruction(StartId + i * 0x06 + 0x0B, std::bind(mem::_binary_imm_var <_T>, ph::_1, binary_funcs.at(i)));
+			this->m_vm.setInstruction(StartId + i * 0x06 + 0x0C, std::bind(mem::_binary_mov_const <_T>, ph::_1, binary_funcs.at(i)));
+			this->m_vm.setInstruction(StartId + i * 0x06 + 0x0D, std::bind(mem::_binary_mov_var <_T>, ph::_1, binary_funcs.at(i)));
+			this->m_vm.setInstruction(StartId + i * 0x06 + 0x0E, std::bind(mem::_binary_reg <_T>, ph::_1, binary_funcs.at(i)));
+			this->m_vm.setInstruction(StartId + i * 0x06 + 0x0F, std::bind(mem::_binary_stack <_T>, ph::_1, binary_funcs.at(i)));
+		}
+
+		//neg
+		//not
+	}
+	void Settings::initIntegerSets() {
+		this->initIntTypeSet <uint8_t, 0x100>();
+		this->initIntTypeSet <int8_t, 0x180>();
+		this->initIntTypeSet <uint16_t, 0x200>();
+		this->initIntTypeSet <int16_t, 0x280>();
+		this->initIntTypeSet <uint32_t, 0x300>();
+		this->initIntTypeSet <int32_t, 0x380>();
+		this->initIntTypeSet <uint64_t, 0x400>();
+		this->initIntTypeSet <int64_t, 0x480>();
 	}
 }

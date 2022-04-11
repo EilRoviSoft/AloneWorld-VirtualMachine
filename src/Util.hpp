@@ -12,7 +12,7 @@ namespace alone {
 		std::string ascii2hex(size_t number, size_t length);
 		std::string cleanup(const std::string& src);
 		std::string shrink(const std::string& src);
-		std::vector <uint8_t> string2vector(const std::string& src);
+		std::vector <char> string2vector(const std::string& src);
 	}
 	namespace op {
 		//compare operations

@@ -11,5 +11,6 @@
     <ClInclude Include="src\Info.hpp" />
     <ClInclude Include="src\Util.hpp" />
     <ClInclude Include="src\Instruction.hpp" />
+    <ClInclude Include="src\Console.hpp" />
   </ItemGroup>
 </Project>
