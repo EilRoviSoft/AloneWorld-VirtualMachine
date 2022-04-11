@@ -50,14 +50,18 @@ namespace alone {
 			for (size_t i = 0; i != code.size(); i++)
 				this->_memory[i + info::RegMemSize - 0x10] = code[i];
 
-			const size_t& offset = *reinterpret_cast <const size_t*>(info::POX), & length = *reinterpret_cast <const size_t*>(info::PLX);
+			const size_t& offset = ctx->getRegister <size_t>(info::POX), & length = ctx->getRegister <size_t>(info::PLX);
 
-			*reinterpret_cast <size_t*>(info::IP) = offset;
-			*reinterpret_cast <size_t*>(info::SP) = offset + length;
-			*reinterpret_cast <size_t*>(info::BP) = offset + length;
+			ctx->getRegister <size_t>(info::IP) = 0;
+			ctx->getRegister <size_t>(info::SP) = length;
+			ctx->getRegister <size_t>(info::BP) = length;
 		}
 		void process() {
 			this->ctx->flags->PAF = true;
+			while (this->ctx->flags->PAF) {
+				uint16_t inst_id = ctx->getLocal <uint16_t>(*ctx->ip);
+				this->_instructions.at(inst_id)(*this);
+			}
 		}
 		void stop() {
 			this->ctx->flags->PAF = false;

@@ -1,0 +1,4 @@
+0x0010: char getchar(void)
+0x0011: void putchar(char)
+0x0012: int getint(void)
+0x0013: void putint(int)

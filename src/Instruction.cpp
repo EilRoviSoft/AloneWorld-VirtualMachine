@@ -305,13 +305,14 @@ namespace alone::inst {
 		template <class _T>
 		void _binary_stack(VirtualMachine& vm, std::function <_T(const _T&, const _T&)> func) {
 			auto& ctx = vm.ctx;
-			_T& lhs = ctx->getLocal <_T>(*ctx->sp - sizeof(_T));
-			_T& rhs = ctx->getLocal <_T>(*ctx->sp);
+			_T& lhs = ctx->getLocal <_T>(*ctx->sp - sizeof(_T) * 2);
+			_T& rhs = ctx->getLocal <_T>(*ctx->sp - sizeof(_T));
 
 			lhs = func(lhs, rhs);
+			rhs = 0;
 
 			*ctx->sp -= sizeof(_T);
-			ctx->ip += 0x02;
+			*ctx->ip += 0x02;
 		}
 		template <class _T>
 		void _binary_reg(VirtualMachine& vm, std::function <_T(const _T&, const _T&)> func) {

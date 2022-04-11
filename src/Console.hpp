@@ -17,17 +17,15 @@ namespace alone {
 		int process(std::istream& is) {
 			bool flag = true;
 
-			while (true) {
-				std::vector <std::string> splitted;
-				std::string line;
-				std::getline(is, line);
+			std::vector <std::string> splitted;
+			std::string line;
+			std::getline(is, line);
 
-				splitted = string::split(line, ' ');
-				if (splitted[0] == "exec") {
-					this->_execute(splitted[1]);
-				} else if (splitted[0] == "halt") {
-					flag = false;
-				}
+			splitted = string::split(line, ' ');
+			if (splitted[0] == "exec") {
+				this->_execute(splitted[1]);
+			} else if (splitted[0] == "halt") {
+				flag = false;
 			}
 
 			return 0;

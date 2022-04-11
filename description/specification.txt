@@ -27,7 +27,7 @@ Instructions set
 		set					0x07			[global = local]
 		cmp					0x08	0x09	[var <=> const, lhs <=> rhs]
 
-		add					0x0A	0x0F	[var imm const, var imm var, var mov lhs and const, var mov lhs and rhs, stack, reg]
+		add					0x0A	0x0F	[var imm const, var imm var, var mov lhs and const, var mov lhs and rhs, reg, stack]
 		sub					0x10	0x15
 		mul					0x16	0x1B
 		div					0x1C	0x21
