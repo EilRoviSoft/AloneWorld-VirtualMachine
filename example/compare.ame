@@ -1,0 +1,48 @@
+; meta:
+C800 0000 0000 0000         ; length
+8E00 0000 0000 0000         ; offset
+
+; [0080]
+; @data:
+4C45 5353                   ; string "LESS"
+4D4F 5245                   ; string "MORE"
+4551 5541 4C00              ; string "EQUAL\0"
+; len 0x0E
+
+; [008E]
+; @main:
+0400
+0100 1200 0000 0000 0000    ; ncall int getint(void)
+8303 4000 0000 0000 0000 3000 0000 0000 0000    ; mov32i $GRS, $sp
+0100 1200 0000 0000 0000    ; ncall int getint(void)
+8303 4400 0000 0000 0000 3000 0000 0000 0000    ; mov32i [GRS+4], $sp
+; len 0x3A
+; [00C8]
+8C03                        ; cmp32i_stack
+2600 E600 0000 0000 0000    ; jmp_grt @more
+2B00 0E01 0000 0000 0000 3601 0000 0000 0000    ; jif_lwr @less, @equal
+; len 0x1E
+; @more:
+; [00E6]
+0404 0400 0000 0000 0000    ; push64u 4h
+0404 8400 0000 0000 0000    ; push64u $more [0x0084]
+0100 1500 0000 0000 0000    ; ncall putstr(char*,ulong)
+2000 AC01 0000 0000 0000    ; jmp @end
+; len 0x28
+; @less:
+; [010E]
+0404 0400 0000 0000 0000    ; push64u 4h
+0404 8000 0000 0000 0000    ; push64u $less [0x0080]
+0100 1500 0000 0000 0000    ; ncall putstr(char*,ulong)
+2000 AC01 0000 0000 0000    ; jmp @end
+; len 0x28
+; @equal:
+; [0136]
+0404 0500 0000 0000 0000    ; push64u 5h
+0404 8800 0000 0000 0000    ; push64u $equal [0x0088]
+0100 1500 0000 0000 0000    ; ncall putstr(char*,ulong)
+; len 0x1E
+; @end:
+; [0154]
+0000                        ; halt
+; len 0x02

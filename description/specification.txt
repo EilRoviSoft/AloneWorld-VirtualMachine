@@ -1,10 +1,13 @@
 Instructions set
 	SYSTEM //system commands [0x0 - 0xFF]
-		halt 		0x0
+		halt 		0x00
 		
 		ncall		0x01 	call native function
 		call		0x02 	write adress to heap of stack, move bp, jump to this adress
 		ret 		0x03 	exit from last function, clean stack to bp, jump to adress at bp
+
+		enter		0x04	moves bp and saves previous position on heap
+		release		0x05	moves bp to previous position and clears all memory between places
 
 		malloc		0x10	allocate memory block and stores adress to compute register
 		realloc		0x11	reallocate memory block and stores actual adress to compute register
@@ -12,35 +15,45 @@ Instructions set
 
 		jmp			0x20 	jump to adress
 		goto		0x21 	jump to adress with saving previous adress
-		jif_g		0x22	0x23 	jump to adress if Positive
-		jif_goq		0x24	0x25 	jump to adress if Positive or Zero
-		jif_l		0x26	0x27 	jump to adress if Negative
-		jif_loq		0x28	0x29 	jump to adress if Negative or Zero
-		jif_eq		0x2A	0x2B 	[if equal ip = 1_adress, if equal ip = 1_adress the ip 1_adress] jump to adress if Zero
-		jif_neq		0x2C	0x2D 	jump to adress if NotZero
+		jif_eql		0x22	0x23 	[if equal ip = 1_adress, if equal ip = 1_adress the ip 1_adress] jump to adress if Zero
+		jif_neq		0x24	0x25 	jump to adress if NotZero
+		jif_grt		0x26	0x27 	jump to adress if Positive
+		jif_goq		0x28	0x29 	jump to adress if Positive or Zero
+		jif_lwr		0x2A	0x2B 	jump to adress if Negative
+		jif_loq		0x2C	0x2D 	jump to adress if Negative or Zero
 
 	INTEGER [0x0 + Shift - 0x7F + Shift]
-		mov 				0x00	0x01	[var = const, lhs = rhs]
-		push	 			0x02	0x03	[const, var]
-		pop					0x04	0x05	[reg = heap, var = heap]
-		get					0x06			[local = global]
-		set					0x07			[global = local]
-		cmp					0x08	0x09	[var <=> const, lhs <=> rhs]
+		mov					0x02	0x03	[var = const, var_lhs = var_rhs]
+		push	 			0x04	0x05	[const, var]
+		pop					0x06	0x07	[reg = heap, var = heap]
+		get					0x08			[local = global]
+		set					0x09			[global = local]
+		cmp					0x0A	0x0D	[var <=> const, lhs <=> rhs, stack, reg]
 
-		add					0x0A	0x0F	[var imm const, var imm var, var mov lhs and const, var mov lhs and rhs, reg, stack]
-		sub					0x10	0x15
-		mul					0x16	0x1B
-		div					0x1C	0x21
+		add					0x10	0x15	[var imm const, var imm var, var mov lhs and const, var mov lhs and rhs, reg, stack]
+		sub					0x16	0x1B
+		mul					0x1C	0x21
+		div					0x22	0x27
 
-		mod					0x22	0x27
-		and					0x28	0x2D
-		or					0x2E	0x33
-		xor					0x34	0x39
+		mod					0x28	0x2D
+		and					0x2E	0x33
+		or					0x34	0x39
+		xor					0x3A	0x3F
 
-		shl					0x3A	0x3F
-		shr					0x40	0x45
-		neg					0x46	0x47	[var = -var, lhs = -rhs]
-		not					0x48	0x49	[var = ~var, lhs = ~rhs]
+		shl					0x40	0x45
+		shr					0x46	0x4B
+		neg					0x4C	0x4D	[var = -var, lhs = -rhs]
+		not					0x4E	0x4F	[var = ~var, lhs = ~rhs]
+
+	BASIC SHIFTS:
+		UBYTE [0x100]
+		BYTE [0x180]
+		USHORT [0x200]
+		SHORT [0x280]
+		UINT [0x300]
+		INT [0x380]
+		ULONG [0x400]
+		LONG [0x480]
 
 Registers set:
 	

@@ -1,0 +1,2 @@
+exec example/compare.ame
+20 10

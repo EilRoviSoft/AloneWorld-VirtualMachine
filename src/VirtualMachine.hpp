@@ -12,22 +12,23 @@
 
 namespace alone {
 	using Task = std::function <void(class VirtualMachine&)>;
+	struct info_t {
+		size_t retSize;
+		size_t argSize;
+	};
+	using NestedTask = std::pair <info_t, Task>;
 
 	struct Context {
 		info::Flags* flags;
 		size_t* ip = nullptr, * bp = nullptr, * sp = nullptr;
 		size_t* offset, * length;
-		std::byte* mem = nullptr, * regmem = nullptr, * localmem = nullptr;
+		std::byte* mem = nullptr;
 
 		Context(class VirtualMachine& vm);
 
 		template <class _T>
-		_T& getRegister(info::Register reg) {
-			return *reinterpret_cast <_T*>(&regmem[reg]);
-		}
-		template <class _T>
-		_T& getLocal(size_t adress) {
-			return *reinterpret_cast <_T*>(&localmem[adress]);
+		_T& get(size_t adress) {
+			return *reinterpret_cast <_T*>(&mem[adress]);
 		}
 	};
 
@@ -50,16 +51,16 @@ namespace alone {
 			for (size_t i = 0; i != code.size(); i++)
 				this->_memory[i + info::RegMemSize - 0x10] = code[i];
 
-			const size_t& offset = ctx->getRegister <size_t>(info::POX), & length = ctx->getRegister <size_t>(info::PLX);
+			const size_t& offset = ctx->get <size_t>(info::POX), & length = ctx->get <size_t>(info::PLX);
 
-			ctx->getRegister <size_t>(info::IP) = 0;
-			ctx->getRegister <size_t>(info::SP) = length;
-			ctx->getRegister <size_t>(info::BP) = length;
+			ctx->get <size_t>(info::IP) = offset;
+			ctx->get <size_t>(info::SP) = offset + length;
+			ctx->get <size_t>(info::BP) = offset + length;
 		}
 		void process() {
 			this->ctx->flags->PAF = true;
 			while (this->ctx->flags->PAF) {
-				uint16_t inst_id = ctx->getLocal <uint16_t>(*ctx->ip);
+				uint16_t inst_id = ctx->get <uint16_t>(*ctx->ip);
 				this->_instructions.at(inst_id)(*this);
 			}
 		}
@@ -95,17 +96,17 @@ namespace alone {
 			this->_instructions.emplace(id, instruction);
 		}
 
-		void setFunction(size_t id, Task function) {
-			this->_functions.emplace(id, function);
+		void setFunction(size_t id, info_t info, Task function) {
+			this->_functions.emplace(id, NestedTask(info, function));
 		}
 		const Task& getFunction(size_t id) const {
-			return this->_functions.at(id);
+			return this->_functions.at(id).second;
 		}
 
 	private:
 		std::vector <std::byte> _memory;
 		std::set <size_t> _global;
-		std::unordered_map <size_t, Task> _functions;
+		std::unordered_map <size_t, NestedTask> _functions;
 		std::unordered_map <uint16_t, Task> _instructions;
 	};
 }

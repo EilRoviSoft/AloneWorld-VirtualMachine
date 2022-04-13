@@ -54,13 +54,13 @@ namespace alone {
 	}
 	namespace op {
 		bool _greater(const info::Flags& flags) {
-			return false;
+			return !flags.SF && !flags.ZF;
 		}
 		bool _greater_or_equal(const info::Flags& flags) {
 			return !flags.SF || flags.ZF;
 		}
 		bool _lower(const info::Flags& flags) {
-			return flags.SF;
+			return flags.SF && !flags.ZF;
 		}
 		bool _lower_or_equal(const info::Flags& flags) {
 			return flags.SF || flags.ZF;

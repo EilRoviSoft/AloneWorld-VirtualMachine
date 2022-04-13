@@ -6,7 +6,7 @@ namespace alone::info {
 	const size_t InstructionSize = sizeof(uint16_t);
 	const size_t PointerSize = sizeof(uint64_t);
 
-	const size_t RegMemSize = 0x50;
+	const size_t RegMemSize = 0x80;
 	//including registers
 	const size_t LocMemSize = 0x1000;
 
@@ -21,8 +21,10 @@ namespace alone::info {
 		SP = 0x30, //Stack pointer register
 		BP = 0x38, //Base pointer register
 
-		PLX = 0x40, //Program length register
-		POX = 0x48, //Program offset register
+		GRS = 0x40, //General registers start
+
+		PLX = RegMemSize - 0x10, //Program length register
+		POX = RegMemSize - 0x08, //Program offset register
 	};
 
 	struct Flags {
