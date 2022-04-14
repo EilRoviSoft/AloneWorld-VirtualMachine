@@ -1,7 +1,13 @@
 ; meta:
 2200 0000 0000 0000 	; length
-5000 0000 0000 0000 	; offset
+8000 0000 0000 0000 	; offset
 
 ; data:
 
+; [0080]
 ; code:
+0100 1200 0000 0000 0000    ; ncall int getint()
+0100 1200 0000 0000 0000    ; ncall int getint()
+9503                        ; add32i_stack
+0100 1300 0000 0000 0000    ; ncall void putint()
+0000                        ; halt
