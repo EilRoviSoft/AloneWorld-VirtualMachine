@@ -62,7 +62,7 @@ namespace alone::inst {
 			auto& ctx = vm.ctx;
 			size_t adress = ctx->get <size_t>(*ctx->ip + 0x02);
 
-			*ctx->ip = adress;
+			*ctx->ip = info::RegMemSize + adress;
 		}
 		//goto %adress
 		void _goto(VirtualMachine& vm) {}
@@ -178,7 +178,7 @@ namespace alone::inst {
 
 			var = val;
 
-			*ctx->ip += 0x0A + sizeof(_T);
+			*ctx->ip += 0x12;
 		}
 		template <class _T>
 		void _mov_var(VirtualMachine& vm) {
@@ -234,7 +234,7 @@ namespace alone::inst {
 		template <class _T>
 		void _pop_to_var(VirtualMachine& vm) {
 			auto& ctx = vm.ctx;
-			_T& heap = ctx->get <_T>(*ctx->sp - sizeof(_T));
+			_T& heap = ctx->get <_T>(*ctx->sp);
 			size_t adress = ctx->get <_T>(*ctx->ip + 0x02);
 			_T& var = ctx->get <_T>(adress);
 
@@ -242,7 +242,7 @@ namespace alone::inst {
 			heap = 0;
 
 			*ctx->sp -= sizeof(_T);
-			*ctx->ip += 0x0A;
+			*ctx->ip += 0x02;
 		}
 
 		//global memory operations
@@ -431,11 +431,11 @@ namespace alone::inst {
 
 		for (size_t i = 0; i != binary_funcs.size(); i++) {
 			this->m_vm.setInstruction(StartId + i * 0x06 + 0x10, std::bind(mem::_binary_imm_const <_T>, ph::_1, binary_funcs.at(i)));
-			this->m_vm.setInstruction(StartId + i * 0x06 + 0x11, std::bind(mem::_binary_imm_var <_T>, ph::_1, binary_funcs.at(i)));
-			this->m_vm.setInstruction(StartId + i * 0x06 + 0x12, std::bind(mem::_binary_mov_const <_T>, ph::_1, binary_funcs.at(i)));
-			this->m_vm.setInstruction(StartId + i * 0x06 + 0x13, std::bind(mem::_binary_mov_var <_T>, ph::_1, binary_funcs.at(i)));
-			this->m_vm.setInstruction(StartId + i * 0x06 + 0x14, std::bind(mem::_binary_reg <_T>, ph::_1, binary_funcs.at(i)));
-			this->m_vm.setInstruction(StartId + i * 0x06 + 0x15, std::bind(mem::_binary_stack <_T>, ph::_1, binary_funcs.at(i)));
+			this->m_vm.setInstruction(StartId + i * 0x06 + 0x10, std::bind(mem::_binary_imm_var <_T>, ph::_1, binary_funcs.at(i)));
+			this->m_vm.setInstruction(StartId + i * 0x06 + 0x10, std::bind(mem::_binary_mov_const <_T>, ph::_1, binary_funcs.at(i)));
+			this->m_vm.setInstruction(StartId + i * 0x06 + 0x10, std::bind(mem::_binary_mov_var <_T>, ph::_1, binary_funcs.at(i)));
+			this->m_vm.setInstruction(StartId + i * 0x06 + 0x10, std::bind(mem::_binary_reg <_T>, ph::_1, binary_funcs.at(i)));
+			this->m_vm.setInstruction(StartId + i * 0x06 + 0x10, std::bind(mem::_binary_stack <_T>, ph::_1, binary_funcs.at(i)));
 		}
 
 		//neg
